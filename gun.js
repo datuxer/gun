@@ -2213,7 +2213,7 @@
 			}
 		}
 		module.exports = r;
-	})(require, './polyfill/request');
+	})(require, './polyfills/request');
 
 	;require(function(module){
 		P.request = require('./request');
@@ -2233,7 +2233,7 @@
 			P.request.each(this.peers, map, {msg: msg, opt: opt});
 		}
 		module.exports = P;
-	})(require, './polyfill/peer');
+	})(require, './polyfills/peer');
 
 	;require(function(module){
 		if(typeof JSON === 'undefined'){ throw new Error("Include JSON first: ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js") } // for old IE use
