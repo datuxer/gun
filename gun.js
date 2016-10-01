@@ -2244,7 +2244,7 @@
 
 		var Tab = {};
 		Tab.on = Gun.on;//Gun.on.create();
-		Tab.peers = require('../polyfill/peer');
+		Tab.peers = require('../polyfills/peer');
 		Gun.on('get', function(at){
 			var gun = at.gun, opt = gun.Back('opt') || {}, peers = opt.peers;
 			if(!peers || Gun.obj.empty(peers)){

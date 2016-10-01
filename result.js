@@ -4,6 +4,7 @@
 
 	/* UNBUILD */
 
+	
 	var root;
 	if(typeof window !== "undefined"){ root = window }
 	if(typeof global !== "undefined"){ root = global }
@@ -15,13 +16,29 @@
 	var aliases = {};
 	var has = ({}).hasOwnProperty;
 	
+	var expRe = /^\.\.?(\/|$)/;
+	var expand = function(root, name) {
+		var results = [], part;
+		var parts = (expRe.test(name) ? root + '/' + name : name).split('/');
+		for (var i = 0, length = parts.length; i < length; i++) {
+			part = parts[i];
+			if (part === '..') {
+				results.pop();
+			} else if (part !== '.' && part !== '') {
+				results.push(part);
+			}
+		}
+		return results.join('/');
+	};
+	
 	var dirname = function(path) {
 		return path.split('/').slice(0, -1).join('/');
 	};
 	
 	var localRequire = function(path) {
 		return function expanded(name) {
-			return require(name, dirname(path));
+			var absolute = expand(dirname(path), name);
+			return require('./' + absolute, './');
 		};
 	};
 	
@@ -39,6 +56,7 @@
 	var require = function(name, loaderPath) {
 		if (loaderPath == null) loaderPath = '/';
 		var path = expandAlias(name);
+		// console.log(name, path, loaderPath);
 		if (has.call(cache, path)) return cache[path].exports;
 		if (has.call(registry, path)) return initModule(path, registry[path]);
 	
@@ -92,6 +110,7 @@
 	};
 	
 	require._cache = cache;
+	
 	
 	/* UNBUILD */
 
@@ -1040,7 +1059,7 @@
 			}
 		}());
 			
-	});
+	});//module ./api
 
 	require.register('./graph', function(exports, require, module){
 
@@ -1193,11 +1212,10 @@
 		var u;
 		module.exports = Graph;
 			
-	});
+	});//module ./graph
 
 	require.register('./gun', function(exports, require, module){
 
-		// require('./api');
 		
 		function Gun(o){
 			if(!(this instanceof Gun)){ return Gun.create(o) }
@@ -1233,7 +1251,6 @@
 			Gun[f] = v;
 		});
 		Gun.HAM = require('./HAM');
-		// console.log('--->', HAM);
 		Gun.val = require('./val');
 		Gun.node = require('./node');
 		Gun.state = require('./state');
@@ -1357,10 +1374,9 @@
 		
 		if(typeof window !== "undefined"){ window.Gun = Gun }
 		if(typeof common !== "undefined"){ common.exports = Gun }
-		
 		module.exports = Gun;
 			
-	});
+	});//module ./gun
 
 	require.register('./HAM', function(exports, require, module){
 
@@ -1423,16 +1439,15 @@
 		var undefined;
 		module.exports = HAM;
 			
-	});
+	});//module ./HAM
 
 	require.register('./index', function(exports, require, module){
 
 		
 		var Gun = require('./gun');
-		// require('./HAM');
 		module.exports = Gun;
 		
-		// ;(function(){
+		;(function(){
 			function meta(v,f){
 				if(obj_has(Gun.__, f)){ return }
 				obj_put(this._, f, v);
@@ -1504,10 +1519,10 @@
 			var state = Gun.state, state_is = state.is, state_ify = state.ify;
 			var val = Gun.val, val_is = val.is, rel_is = val.rel.is;
 			var u;
-		// }());
+		}());
 		
 			
-	});
+	});//module ./index
 
 	require.register('./node', function(exports, require, module){
 
@@ -1567,7 +1582,7 @@
 		var u;
 		module.exports = Node;
 			
-	});
+	});//module ./node
 
 	require.register('./on', function(exports, require, module){
 
@@ -1698,7 +1713,7 @@
 		function noop(){};
 		module.exports = Scope();
 			
-	});
+	});//module ./on
 
 	require.register('./onify', function(exports, require, module){
 
@@ -1827,7 +1842,7 @@
 		*/
 		module.exports = Chain;
 			
-	});
+	});//module ./onify
 
 	require.register('./schedule', function(exports, require, module){
 
@@ -1869,7 +1884,7 @@
 		}
 		module.exports = s;
 			
-	});
+	});//module ./schedule
 
 	require.register('./state', function(exports, require, module){
 
@@ -1929,7 +1944,7 @@
 		var N_ = Node._, u;
 		module.exports = State;
 			
-	});
+	});//module ./state
 
 	require.register('./type', function(exports, require, module){
 
@@ -2074,10 +2089,9 @@
 		var fn_is = Type.fn.is;
 		var list_is = Type.list.is;
 		var obj = Type.obj, obj_is = obj.is, obj_has = obj.has, obj_map = obj.map;
-		
 		module.exports = Type;
 			
-	});
+	});//module ./type
 
 	require.register('./val', function(exports, require, module){
 
@@ -2124,7 +2138,7 @@
 		var obj = Type.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
 		module.exports = Val;
 			
-	});
+	});//module ./val
 
 	require.register('./adapters/localStorage', function(exports, require, module){
 
@@ -2133,6 +2147,7 @@
 		
 		var root, noop = function(){};
 		if(typeof window !== 'undefined'){ root = window }
+		else { root = {}; }
 		var store = root.localStorage || {setItem: noop, removeItem: noop, getItem: noop};
 		
 		function put(at){ var err, id, opt, root = at.gun._.root;
@@ -2160,11 +2175,10 @@
 		Gun.on('put', put);
 		Gun.on('get', get);
 			
-	});
+	});//module ./adapters/localStorage
 
 	require.register('./adapters/wsp', function(exports, require, module){
-
-		if(typeof JSON === 'undefined'){ throw new Error("Include JSON first: ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js") } // for old IE use
+if(typeof JSON === 'undefined'){ throw new Error("Include JSON first: ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js") } // for old IE use
 		if(typeof Gun === 'undefined'){ return } // TODO: window.Websocket is Browser only. But it would be nice if it could somehow merge it with lib/WSP?
 		
 		var root, noop = function(){};
@@ -2172,7 +2186,7 @@
 		
 		var Tab = {};
 		Tab.on = Gun.on;//Gun.on.create();
-		Tab.peers = require('../polyfill/peer');
+		Tab.peers = require('../polyfills/peer');
 		Gun.on('get', function(at){
 			var gun = at.gun, opt = gun.Back('opt') || {}, peers = opt.peers;
 			if(!peers || Gun.obj.empty(peers)){
@@ -2283,7 +2297,7 @@
 		});
 		
 			
-	});
+	});//module ./adapters/wsp
 
 	require.register('./polyfills/peer', function(exports, require, module){
 
@@ -2305,7 +2319,7 @@
 		}
 		module.exports = P;
 			
-	});
+	});//module ./polyfills/peer
 
 	require.register('./polyfills/request', function(exports, require, module){
 
@@ -2466,8 +2480,31 @@
 		}
 		module.exports = r;
 			
-	});
+	});//module ./polyfills/request
 
-	module && (module.exports = require('./index'));
+	/* UNBUILD */
+
+	
+	require('./type');
+	require('./on');
+	require('./onify');
+	require('./schedule');
+	require('./HAM');
+	require('./val');
+	require('./node');
+	require('./state');
+	require('./graph');
+	
+	require('./gun');
+	var Gun = require('./index');
+	require('./api');
+	require('./adapters/localStorage');
+	require('./polyfills/request');
+	require('./polyfills/peer');
+	require('./adapters/wsp');
+	
+	module && (module.exports = Gun);
+	
+	/* UNBUILD */
 
 }());
