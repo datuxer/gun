@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node examples/http.js 8080",
     "test": "mocha",
-    "unbuild": "node lib/unbuild.js"
+    "unbuild": "node lib/unbuild.js",
+    "build": "node lib/build.js"
   },
   "repository": {
     "type": "git",
